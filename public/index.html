@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Mapping Application</title>
+    <link rel="stylesheet" href="GIS Simplified/ol/ol.css">
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    
+    <div id="map"></div>
+    <div id="mouse-position" class="mouse-position"></div>
+
+    <div id="search-container">
+        <input type="text" id="search-input" placeholder="Search for a state, city, or country..." />
+        <button id="search-button">Search</button>
+    </div>
+    
+    <!-- Popup for measurement result -->
+    <div id="popup" class="ol-popup">
+        <div id="popup-content"></div>
+    </div>
+
+    <!-- Buttons for measurement controls -->
+    <div id="controls">
+        <button id="measure-length">Measure Length</button>
+        <button id="measure-area">Measure Area</button>
+        <button id="rectangle-zoom-in">Zoom In</button>
+        <button id="rectangle-zoom-out">Zoom Out</button>
+        <button id="street-view">Street View</button>
+        <button id="find-my-location">Find My Location</button>
+        <button id="deactivate" class="control-button">Deactivate</button>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+    <script src="GIS Simplified/ol/ol.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
