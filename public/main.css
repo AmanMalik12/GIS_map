@@ -1,11 +1,22 @@
-
-
 #map {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
+}
+
+#navbar {
+    position: absolute;
+    top: -54px;
+    left: 0;
+    width: 50%;
+    color: rgb(78, 47, 218);
+    text-align: jus;
+    padding: 50px;
+    font-size: 15px;
+    font-weight: bold;
+    z-index: 1000; /* Ensure it appears above the map */
 }
 
 #search-container {
