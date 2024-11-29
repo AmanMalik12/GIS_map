@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="style.css">
+    <title>Ludiflex | Login & Registration</title>
+</head>
+<body>
+ <div class="wrapper">
+    <nav class="nav">
+        <div class="nav-logo">
+            <p>JIO Digital Life</p>
+        </div>
+        <div class="nav-button">
+            <button class="btn white-btn" id="loginBtn" onclick="showLogin()">Sign In</button>
+            <button class="btn" id="registerBtn" onclick="showRegister()">Sign Up</button>
+        </div>
+        <div class="nav-menu-btn">
+            <i class="bx bx-menu" onclick="myMenuFunction()"></i>
+        </div>
+    </nav>
+
+    <!-- Form box -->
+    <div class="form-box">
+        
+        <!-- Login form -->
+        <div class="login-container" id="login">
+            <div class="top">
+                <span>Don't have an account? <a href="#" onclick="showRegister()">Sign Up</a></span>
+                <header>Login</header>
+            </div>
+            <div class="input-box">
+                <input type="text" id="login-username" class="input-field" placeholder="Username or Email">
+                <i class="bx bx-user"></i>
+            </div>
+            <div class="input-box">
+                <input type="password" id="login-password" class="input-field" placeholder="Password">
+                <i class="bx bx-lock-alt"></i>
+            </div>
+            <div class="input-box">
+                <input type="submit" class="submit" value="Sign In" onclick="login()">
+            </div>
+            <div class="two-col">
+                <div class="one">
+                    <input type="checkbox" id="login-check">
+                    <label for="login-check"> Remember Me</label>
+                </div>
+                <div class="two">
+                    <label><a href="#">Forgot password?</a></label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration form -->
+        <div class="register-container" id="register">
+            <div class="top">
+                <span>Have an account? <a href="#" onclick="showLogin()">Login</a></span>
+                <header>Sign Up</header>
+            </div>
+            <div class="two-forms">
+                <div class="input-box">
+                    <input type="text" id="register-firstname" class="input-field" placeholder="Firstname">
+                    <i class="bx bx-user"></i>
+                </div>
+                <div class="input-box">
+                    <input type="text" id="register-lastname" class="input-field" placeholder="Lastname">
+                    <i class="bx bx-user"></i>
+                </div>
+            </div>
+            <div class="input-box">
+                <input type="text" id="register-email" class="input-field" placeholder="Email">
+                <i class="bx bx-envelope"></i>
+            </div>
+            <div class="input-box">
+                <input type="password" id="register-password" class="input-field" placeholder="Password">
+                <i class="bx bx-lock-alt"></i>
+            </div>
+            <div class="input-box">
+                <input type="submit" class="submit" value="Register" onclick="register()">
+            </div>
+            <div class="two-col">
+                <div class="one">
+                    <input type="checkbox" id="register-check">
+                    <label for="register-check"> Remember Me</label>
+                </div>
+                <div class="two">
+                    <label><a href="#">Terms & conditions</a></label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>   
+
+<script>
+    let users = JSON.parse(localStorage.getItem("users")) || {}; // Load users from localStorage or initialize as empty
+
+    // Show Login form
+    function showLogin() {
+        document.getElementById("login").style.left = "4px";
+        document.getElementById("register").style.right = "-520px";
+        document.getElementById("loginBtn").className += " white-btn";
+        document.getElementById("registerBtn").className = "btn";
+    }
+
+    // Show Register form
+    function showRegister() {
+        document.getElementById("login").style.left = "-510px";
+        document.getElementById("register").style.right = "5px";
+        document.getElementById("loginBtn").className = "btn";
+        document.getElementById("registerBtn").className += " white-btn";
+    }
+
+    // Register a new user
+    function register() {
+        let firstname = document.getElementById("register-firstname").value;
+        let lastname = document.getElementById("register-lastname").value;
+        let email = document.getElementById("register-email").value;
+        let password = document.getElementById("register-password").value;
+
+        if (firstname && lastname && email && password) {
+            if (users[email]) {
+                alert("This email is already registered. Please use another email.");
+            } else {
+                users[email] = { firstname, lastname, password }; // Save user info
+                localStorage.setItem("users", JSON.stringify(users)); // Store in localStorage
+                alert("Registration successful! Please log in.");
+                showLogin();
+            }
+        } else {
+            alert("Please fill in all fields.");
+        }
+    }
+
+    // Login existing user
+    function login() {
+        let email = document.getElementById("login-username").value;
+        let password = document.getElementById("login-password").value;
+
+        // Retrieve updated users list from localStorage
+        users = JSON.parse(localStorage.getItem("users")) || {};
+
+        if (users[email] && users[email].password === password) {
+            alert("Login successful!");
+            window.location.href = "file:///C:/Users/Sai/Documents/Jio%20Project/index.html";
+        } else {
+            alert("Invalid email or password.");
+        }
+    }
+</script>
+</body>
+</html>
