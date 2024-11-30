@@ -361,5 +361,5 @@ document.getElementById('find-my-location').onclick = function () {
 // Logout button functionality
 document.getElementById('logout-button').onclick = function () {
     // Redirect to the login page
-    window.location.href = "Login & SignUp/login.html"; // Adjust the path if necessary
+    window.location.href = '../Login & SignUp/jio_login.html';  // Adjust the path if necessary
 };
