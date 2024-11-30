@@ -90,7 +90,7 @@
             </button>
         </div>
 
-        <!-- expandable -->
+        <!-- expandable
         <div id="expanded-sidebar" class="hidden flex flex-col bg-white-800 text-gray-500 w-64 h-full py-4 px-4">
             <button id="collapse-btn" class="text-gray-400 hover:text-black self-end">
                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -137,7 +137,7 @@
                     </button>
                 </li>
             </ul> 
-        </div>
+        </div> -->
 
         <!-- Map Container -->
         <main class="flex-1 relative">
@@ -149,21 +149,5 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
     <script src="GIS Simplified/ol/ol.js"></script>
     <script src="main.js"></script>
-    <script>
-        const expandBtn = document.getElementById('expand-btn');
-        const collapseBtn = document.getElementById('collapse-btn');
-        const collapsedSidebar = document.getElementById('collapsed-sidebar');
-        const expandedSidebar = document.getElementById('expanded-sidebar');
-
-        expandBtn.addEventListener('click', () => {
-            collapsedSidebar.classList.add('hidden');
-            expandedSidebar.classList.remove('hidden');
-        });
-
-        collapseBtn.addEventListener('click', () => {
-            expandedSidebar.classList.add('hidden');
-            collapsedSidebar.classList.remove('hidden');
-        });
-    </script>
 </body>
 </html>
