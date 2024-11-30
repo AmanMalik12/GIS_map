@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Mapping Application</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="GIS Simplified/ol/ol.css">
     <link rel="stylesheet" href="main.css">
 </head>
@@ -30,11 +29,15 @@
 
 
 
-        <!-- Map Container -->
-        <main class="flex-1 relative">
-            <div id="map" class="h-full"></div>
-            <div id="mouse-position" class="absolute bottom-4 left-4 bg-white text-black px-4 py-2 rounded-md"></div>
-        </main>
+    <!-- Buttons for measurement controls -->
+    <div id="controls">
+        <button id="measure-length">Measure Length</button>
+        <button id="measure-area">Measure Area</button>
+        <button id="rectangle-zoom-in">Zoom In</button>
+        <button id="rectangle-zoom-out">Zoom Out</button>
+        <button id="street-view">Street View</button>
+        <button id="find-my-location">Find My Location</button>
+        <button id="deactivate" class="control-button">Deactivate</button>
     </div>
 
     <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
