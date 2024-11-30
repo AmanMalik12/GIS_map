@@ -1,10 +1,19 @@
-#map {
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* #map {
+
+#032486
+#103CC8
+
+
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
-}
+} */
 
 #logout-container {
     position: absolute;
@@ -13,6 +22,10 @@
     z-index: 1000;
 }
 
+
+.nav{
+    background-color: #007bff;
+}
 #logout-button {
     padding: 8px 12px;
     font-size: 16px;
@@ -61,7 +74,7 @@
     margin-left: 5px;
     cursor: pointer;
     border: none;
-    background-color: #007bff;
+    background-color: #032486;
     color: white;
     border-radius: 4px;
 }
