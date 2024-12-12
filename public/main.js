@@ -359,7 +359,8 @@ document.getElementById('find-my-location').onclick = function () {
 };
 
 // Logout button functionality
-document.getElementById('logout-button').onclick = function () {
-    // Redirect to the login page
-    window.location.href = "Login & SignUp/login.html"; // Adjust the path if necessary
-};
+document.getElementById('logout-button').addEventListener('click', () => {
+    // Example: Clear user session and redirect to login page
+    alert('You have been logged out!');
+    window.location.href = '/Users/NamanMalik/Downloads/Jio Project 3/public/Login & SignUp/jio_login.html'; // Replace with your login page URL
+});
