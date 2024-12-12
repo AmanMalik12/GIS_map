@@ -117,8 +117,16 @@
     <!-- Sign Up Link -->
     <p class="text-center text-sm text-gray-600 mt-6">
         Already have an account?
-      <a href="#" class="text-blue-600 hover:underline">Login</a>
+      <a href="../Login & SignUp/jio_login.html" class="text-blue-600 hover:underline">Login</a>
     </p>
   </div>
+  <script src="../Login & SignUp/auth.js"></script>
+  <script>
+    const form = document.querySelector("form");
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        handleSignup();
+    });
+</script>
 </body>
 </html>

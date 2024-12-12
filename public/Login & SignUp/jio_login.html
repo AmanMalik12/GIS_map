@@ -80,8 +80,16 @@
     <!-- Sign Up Link -->
     <p class="text-center text-sm text-gray-600 mt-6">
       Don’t have an account? 
-      <a href="#" class="text-blue-600 hover:underline">SignUp</a>
+      <a href="../Login & SignUp/jio_signin.html" class="text-blue-600 hover:underline">SignUp</a>
     </p>
   </div>
+  <script src="../Login & SignUp/auth.js"></script>
+  <script>
+    const form = document.querySelector("form");
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        handleLogin();
+    });
+</script>
 </body>
 </html>

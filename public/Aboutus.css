@@ -1,0 +1,45 @@
+*{
+    margin: 0%;
+    padding: 0%;
+    box-sizing: border-box;
+
+    header {
+        background: linear-gradient(135deg,#57aae2,#232db4);
+        padding: 15px;
+        text-align: center;
+        color: white;
+      }
+  
+}
+
+.rounded-circle {
+    border-radius: 50%;
+}
+.size .jio-size{
+    font-size:4.8rem;
+    color: rgb(209, 23, 32);
+}
+.size .digitallife-size{
+    font-size: 2.8rem;
+    color: rgb(221, 59, 19);
+    padding-left: 45px;
+}
+.mx-auto{
+    border: none;
+    height: 10px;
+    background-color: aqua;
+}
+/* .footer{
+    background: linear-gradient(135deg, #6bbef5, #4727d6);
+
+} */
+
+@media (max-width: 425px) {
+    .container .w-25 {
+        width: 100% !important;
+        text-align: start !important;
+        padding: 0% !important;
+    }
+
+    
+}

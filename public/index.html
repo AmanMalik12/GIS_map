@@ -10,140 +10,124 @@
 </head>
 <body class="bg-gray-100 ">
     <!-- Navbar -->
-    <nav class=" left-0 w-full bg-blue-600 text-white p-4 flex justify-between items-center z-10 shadow-lg">
+    <nav class="fixed left-0 w-full bg-blue-600 text-white p-4 flex justify-between items-center z-10 shadow-lg">
         <div class="flex items-center space-x-4">
             <img src="./image/jio.png" alt="Logo" class="w-10 h-10">
             <h1 class="text-xl font-bold">Jio Digital Life</h1>
         </div>
         <div class="flex items-center space-x-6">
-            <a href="#" class="hover:underline">Home</a>
-            <a href="#" class="hover:underline">About Us</a>
-            <a href="#" class="hover:underline">Contact Us</a>
+            <a href="../public/Aboutus.html" class="hover:underline">AboutUs</a>
+            <a href="../public/Contactus.html" class="hover:underline">ContactUs</a>
+            
             <input 
                 type="text" 
                 class="px-4 py-2 rounded-md text-black" 
                 placeholder="Search for your location..." 
                 id="search-input"
             />
-            <button class="bg-white text-blue-600 px-4 py-2 rounded-md" id="search-button">Search</button>
-            <button class="bg-red-500 px-4 py-2 rounded-md text-white" id="logout-button">Logout</button>
+            <button id="search-button" class="bg-white text-blue-600 px-4 py-2 rounded-md">Search</button>
+            <button id="logout-button" class="bg-red-500 px-4 py-2 rounded-md text-white">Logout</button>
         </div>
     </nav>
     
-
-
-
-
-
-    <!-- <nav class="bg-blue-600 text-white p-4 flex justify-between items-center">
-        <div class="flex items-center space-x-4">
-            <img src="./image/jio.png" alt="Logo" class="w-10 h-10">
-            <h1 class="text-xl font-bold">Jio Digital Life</h1>
-        </div>
-        <div class="flex items-center space-x-6">
-            <a href="#" class="hover:underline">Home</a>
-            <a href="#" class="hover:underline">About Us</a>
-            <a href="#" class="hover:underline">Contact Us</a>
-            <input 
-                type="text" 
-                class="px-4 py-2 rounded-md text-black" 
-                placeholder="Search for your location..." 
-                id="search-input"
-            />
-            <button class="bg-white text-blue-600 px-4 py-2 rounded-md" id="search-button">Search</button>
-            <button class="bg-red-500 px-4 py-2 rounded-md text-white" id="logout-button">Logout</button>
-        </div>
-    </nav> -->
 
     <!-- Main Content -->
     <div class="flex h-screen">
         <!-- Sidebar -->
         <div id="collapsed-sidebar" class="flex flex-col bg-white text-white w-16 h-full py-4 items-center space-y-6 pt-20">
             
-            <button class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
+            <button id="measure-length" class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
                 <img src="./image/scale.png" alt="Menu" class="w-6 h-6">
                 <span class="text-sm mt-1 text-center">Measure</span>
             </button>
-            <button class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
+            <button id="measure-area" class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
                 <img src="./image/area.png" alt="Menu" class="w-6 h-6">
                 <span class="text-sm mt-1 text-center">Area</span>
             </button>
-            <button class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
+            <button id="street-view" class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
                 <img src="./image/st_view.png" alt="Menu" class="w-6 h-6">
                 <span class="text-sm mt-1 text-center">St. View</span>
             </button>
-            <button class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
+            <button id="rectangle-zoom-in" class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
                 <img src="./image/zoom_in.png" alt="Menu" class="w-6 h-6">
                 <span class="text-sm mt-1 text-center">Zoom In</span>
             </button>
-            <button class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
+            <button id="rectangle-zoom-out" class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
                 <img src="./image/zoom_out.png" alt="Menu" class="w-6 h-6">
                 <span class="text-sm mt-1 text-center">Zoom Out</span>
             </button>
-            <button class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
+            <button id="find-my-location" class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
                 <img src="./image/my-location.png" alt="Menu" class="w-6 h-6">
                 <span class="text-sm mt-1 text-center">My location</span>
             </button>
-            
-            <button class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
+            <button id="satellite-view" class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
+                <img src="./image/earth.png" alt="Menu" class="w-6 h-6">
+                <span class="text-sm mt-1 text-center">Satellite View</span>
+            </button>
+<!-- Button for Zooming to Coordinates -->
+<!-- <button id="zoom-to-coordinates" class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
+    <img src="./image/zoom.png" alt="Zoom to Coordinates" class="w-6 h-6">
+    <span class="text-sm mt-1 text-center">Zoom to Coordinates</span>
+</button> -->
+
+<!-- Coordinates Input Form (positioned over the map) -->
+<!-- <div id="coordinate-input">
+    <input type="text" id="latitude" placeholder="Enter Latitude" class="p-2 border border-gray-300 mt-2">
+    <input type="text" id="longitude" placeholder="Enter Longitude" class="p-2 border border-gray-300 mt-2">
+    <button id="find-location" class="bg-blue-500 text-white p-2 mt-2">Find Location</button>
+</div> -->
+               <!-- Scale button -->
+               <button id="scale-select" class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
+                <img src="./image/scale select.png" alt="Menu" class="w-6 h-6">
+                <span class="text-sm mt-1 text-center">Scale</span>
+            </button>
+
+    <!-- Scale selector dropdown -->
+    <div id="scale-selector" style="position: absolute; top: 10%; left: 10%; z-index: 1000; background-color: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); display: none;">
+        <label for="scale-dropdown" style="font-size: 14px; font-family: Arial, sans-serif;">Select Scale:</label>
+        <select id="scale-dropdown" style="width: 150px; padding: 5px; border-radius: 4px; border: 1px solid #ddd;">
+            <option value="">Choose Scale</option>
+            <option value="36979000">1:36,979,000</option>
+            <option value="18489000">1:18,489,000</option>
+            <option value="9245000">1:9,245,000</option>
+            <option value="4622000">1:4,622,000</option>
+            <option value="2311000">1:2,311,000</option>
+            <option value="1156000">1:1,156,000</option>
+            <option value="578000">1:578,000</option>
+            <option value="289000">1:289,000</option>
+            <option value="144000">1:144,000</option>
+            <option value="72000">1:72,000</option>
+            <option value="36000">1:36,000</option>
+            <option value="18000">1:18,000</option>
+            <option value="9000">1:9,000</option>
+            <option value="5000">1:5,000</option>
+            <option value="2000">1:2,000</option>
+            <option value="1000">1:1,000</option>
+
+        </select>
+    </div>
+
+    <button id="snapshot-button" class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
+        <img src="./image/camera.png" alt="Snapshot" class="w-6 h-6">
+        <span class="text-sm mt-1 text-center">Snapshot</span>
+    </button>
+                          
+            <button id="deactivate" class="text-gray-400 hover:text-black flex flex-col items-center justify-center">
                 <img src="./image/deactivate.png" alt="Menu" class="w-6 h-6">
+                <span class="text-sm mt-1 text-center">Deactivate</span>
             </button>
         </div>
 
-        <!-- expandable
-        <div id="expanded-sidebar" class="hidden flex flex-col bg-white-800 text-gray-500 w-64 h-full py-4 px-4">
-            <button id="collapse-btn" class="text-gray-400 hover:text-black self-end">
-                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-
-            
-            <ul class="space-y-4 mt-4">
-                <li>
-                    <button class="w-full flex items-center">
-                        <img src="./image/scale.png" alt="Measure Length" class="w-6 h-6 mr-2">
-                        Measure Length
-                    </button>
-                </li>
-                <li>
-                    <button class="w-full flex items-center">
-                        <img src="./image/area.png" alt="Measure Area" class="w-6 h-6 mr-2">
-                        Measure Area
-                    </button>
-                </li>
-                <li>
-                    <button class="w-full flex items-center">
-                        <img src="./image/st_view.png" alt="Street View" class="w-6 h-6 mr-2">
-                        Street View
-                    </button>
-                </li>
-                <li>
-                    <button class="w-full flex items-center">
-                        <img src="./image/zoom_in.png" alt="Zoom In" class="w-6 h-6 mr-2">
-                        Zoom In
-                    </button>
-                </li>
-                <li>
-                    <button class="w-full flex items-center">
-                        <img src="./image/zoom_out.png" alt="Zoom Out" class="w-6 h-6 mr-2">
-                        Zoom Out
-                    </button>
-                </li>
-                <li>
-                    <button class="w-full flex items-center">
-                        <img src="./image/my-location.png" alt="Find My Location" class="w-6 h-6 mr-2">
-                        Find My Location
-                    </button>
-                </li>
-            </ul> 
-        </div> -->
 
         <!-- Map Container -->
         <main class="flex-1 relative">
             <div id="map" class="h-full"></div>
             <div id="mouse-position" class="absolute bottom-4 left-4 bg-white text-black px-4 py-2 rounded-md"></div>
         </main>
+    </div>
+
+    <div id="popup" class="ol-popup">
+        <div id="popup-content"></div>
     </div>
 
     <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>

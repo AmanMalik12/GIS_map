@@ -133,18 +133,109 @@
 }
 
 
+/* Popup container styling */
 .ol-popup {
     position: absolute;
+    background-color: #ffffff; /* White background */
+    border: 2px solid #005eb8; /* Blue for border */
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    font-family: Arial, sans-serif;
+    color: #0a0a0a; /* Jio black for text */
+    z-index: 100;
+    min-width: 200px;
+}
+
+.ol-popup img {
+    display: block;
+    margin: 0 auto;
+    max-width: 90%;
+    max-height: 150px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+
+/* Content inside the popup */
+#popup-content strong {
+    color: #005eb8; /* Jio blue for strong text */
+    font-size: 1em;
+}
+
+#popup-content {
+    font-size: 1em;
+    text-align: left;
+    color: #0a0a0a; /* Jio blue */
+}
+
+/* Add a subtle animation */
+.ol-popup {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Style for the scale selector dropdown */
+/* Scale Selector Container */
+#scale-selector {
+    position: absolute;
+    top: 40px; /* Adjusted to place below the button */
+    left: 0; /* Align directly under the Scale button */
+    z-index: 1000;
     background-color: white;
     padding: 10px;
-    border: 1px solid black;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: none; /* Hidden by default */
+}
+
+/* Label inside the Scale Selector */
+#scale-selector label {
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* Dropdown inside the Scale Selector */
+#scale-dropdown {
+    width: 150px;
+    padding: 5px;
     border-radius: 4px;
-    bottom: 12px;
-    min-width: 100px;
-    max-width: 200px;
-    font-size: 12px;
-    color: black;
-    z-index: 1001; /* Higher than controls */
-    opacity: 1; /* Popup is fully visible */
-    transition: none; /* No transition for instant display */
+    border: 1px solid #ddd;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    color: #555;
+}
+
+
+/* Optional: Add some hover effects for dropdown options */
+#scale-dropdown option:hover {
+    background-color: #f1f1f1;
+}
+
+#coordinate-input {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centers the form */
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    color: #000; /* Black text color */
+    box-shadow: 0 2px 10px rgba(19, 15, 15, 0.2);
+    z-index: 1000; /* Make sure it stays above the map */
+    display: block; /* Ensure the form is displayed */
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

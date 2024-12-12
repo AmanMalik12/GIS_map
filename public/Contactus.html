@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .service-box {
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .service-box:hover {
+      transform: scale(1.05);
+    }
+
+    .full-height-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+
+  <!-- Header -->
+  <div class="bg-blue-700 h-16 flex items-center justify-center">
+    <div class="flex items-center">
+      <img src="../public/image/jio.png" alt="Jio Logo" class="w-10 h-10" />
+      <span class="text-white font-bold text-lg ml-4">Digital Life</span>
+    </div>
+  </div>
+
+  <!-- Main Section -->
+  <div class="flex h-[calc(100vh-4rem)]">
+    <!-- Left Half: Contact Us Content -->
+    <div class="lg:w-1/2 w-full px-6 flex flex-col justify-center">
+      <!-- Center-aligned Heading and Subheading -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Contact Us</h1>
+        <p class="text-gray-600">You can reach us anytime for any queries</p>
+      </div>
+
+      <!-- New Services -->
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold mb-4">New services</h2>
+        <div class="bg-white p-6 shadow-md rounded-lg service-box flex items-center space-x-4">
+          <div class="text-blue-500 text-2xl">
+            <i class="fas fa-phone mb-2 block"></i>
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div>
+            <p class="text-gray-800 font-medium">1800-8899-444</p>
+            <p class="text-gray-500">business@jio.com</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Existing Business Services -->
+      <div>
+        <h2 class="text-3xl font-bold mb-4">Existing business services</h2>
+        <div class="bg-white p-6 shadow-md rounded-lg service-box flex items-center space-x-4">
+          <div class="text-blue-500 text-2xl">
+            <i class="fas fa-phone mb-2 block"></i>
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div>
+            <p class="text-gray-800 font-medium">1800-8899-333</p>
+            <p class="text-gray-500">enterprisecare@jio.com</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Half: Full Image -->
+    <div class="lg:w-1/2 w-full h-full">
+      <img src="../public/image/contact us.png" alt="Illustration" class="full-height-image" />
+    </div>
+  </div>
+
+</body>
+
+</html>

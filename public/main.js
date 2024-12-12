@@ -2,6 +2,7 @@
 var mapView = new ol.View({
     center: ol.proj.fromLonLat([72.585717, 23.021245]),
     zoom: 8
+    
 });
 
 var map = new ol.Map({
@@ -25,6 +26,35 @@ var streetViewLayer = new ol.layer.Tile({
     })
 });
 map.addLayer(streetViewLayer);
+
+// Satellite Layer
+var satelliteLayer = new ol.layer.Tile({
+    title: 'Satellite View',
+    visible: false,  // Hidden by default
+    source: new ol.source.XYZ({
+        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        crossOrigin: 'anonymous' // Enables canvas usage
+    })
+});
+map.addLayer(satelliteLayer);
+
+// Button for Satellite View
+document.getElementById('satellite-view').addEventListener('click', function () {
+    // Check if satellite view is active
+    const isSatelliteActive = satelliteLayer.getVisible();
+
+    // Toggle satellite layer visibility
+    satelliteLayer.setVisible(!isSatelliteActive);
+
+    if (!isSatelliteActive) {
+        // If activating satellite view, deactivate other layers
+        osmTile.setVisible(false);
+        streetViewLayer.setVisible(false);
+    } else {
+        // If deactivating satellite view, reactivate the default OSM layer
+        osmTile.setVisible(true);
+    }
+});
 
 // Mouse Position control
 var mousePositionControl = new ol.control.MousePosition({
@@ -56,14 +86,30 @@ var popupActive = true;  // Default is true, meaning popup is active
 // Button click event handlers to disable popup during measurement or zooming
 function disablePopup() {
     popupActive = false;
-    document.getElementById('popup-content').innerHTML = "Popup is disabled while using other functionalities.";
+    document.getElementById('popup-content').innerHTML = content;
 }
 
 // Re-enable popup functionality
 function enablePopup() {
     popupActive = true;
-    document.getElementById('popup-content').innerHTML = "Click on the map to get location information.";
-}
+    var content = `
+        <div style="position: relative; text-align: left;">
+            <!-- Logo -->
+            <img id="popup-image" src="./image/jio.png" alt="Location Image" 
+                style="width: 80px; height: 80px; border-radius: 50%; 
+                    position: absolute; top: -40px; left: 50%; transform: translateX(-50%); 
+                    border: 2px solid white; background: white; box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);">
+            
+            <!-- Popup Content -->
+            <div style="padding-top: 50px; text-align: left; font-family: Arial, sans-serif;">
+                <strong>Click on the map to get location information.</strong><br>
+            </div>
+        </div>
+    `;
+    
+    // Set the content for the popup
+    document.getElementById('popup-content').innerHTML = content;
+    }
 
 // Measurement variables
 var draw;
@@ -231,13 +277,25 @@ map.on('singleclick', function (event) {
             var state = data.address.state || "State not found";
             var district = data.address.county || data.address.city || "District not found";
 
-            var content = `<strong>Location Information</strong><br>
-                           Country: ${country}<br>
-                           State: ${state}<br>
-                           District: ${district}<br>
-                           Latitude: ${lonLat[1].toFixed(4)}<br>
-                           Longitude: ${lonLat[0].toFixed(4)}`;
-            
+            var content = `
+            <div style="position: relative; text-align: left;">
+                <!-- Logo -->
+                <img id="popup-image" src="./image/jio.png" alt="Location Image" 
+                     style="width: 80px; height: 80px; border-radius: 50%; 
+                            position: absolute; top: -40px; left: 50%; transform: translateX(-50%); 
+                            border: 2px solid white; background: white; box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);">
+                
+                <!-- Popup Content -->
+                <div style="padding-top: 50px; text-align: left; font-family: Arial, sans-serif;">
+                    <strong>Location Information</strong><br>
+                    Country: ${country}<br>
+                    State: ${state}<br>
+                    District: ${district}<br>
+                    Latitude: ${lonLat[1].toFixed(4)}<br>
+                    Longitude: ${lonLat[0].toFixed(4)}
+                </div>
+            </div>
+        `;
             document.getElementById('popup-content').innerHTML = content;
             popup.setPosition(coordinate);
         })
@@ -248,7 +306,6 @@ map.on('singleclick', function (event) {
         });
 });
 
-// Search Location
 // Search Location
 function searchLocation(query) {
     var urlIndia = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&countrycodes=IN&limit=1`;
@@ -296,14 +353,27 @@ function displayLocation(location) {
 
     // Set the popup content and position
     var content = `
-        <strong>Location Found</strong><br>
-        ${location.display_name}
-        <br>Latitude: ${parseFloat(location.lat).toFixed(4)}<br>
-        Longitude: ${parseFloat(location.lon).toFixed(4)}
-    `;
+    <div style="position: relative; text-align: left;">
+        <!-- Logo -->
+        <img id="popup-image" src="./image/jio.png" alt="Location Image" 
+             style="width: 80px; height: 80px; border-radius: 50%; 
+                    position: absolute; top: -40px; left: 50%; transform: translateX(-50%); 
+                    border: 2px solid white; background: white; box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);">
+        
+        <!-- Popup Content -->
+        <div style="padding-top: 50px; text-align: left; font-family: Arial, sans-serif;">
+            <strong>Location Found</strong><br>
+            ${location.display_name}<br>
+            Latitude: ${parseFloat(location.lat).toFixed(4)}<br>
+            Longitude: ${parseFloat(location.lon).toFixed(4)}
+        </div>
+    </div>
+`;
+
     document.getElementById('popup-content').innerHTML = content;
     popup.setPosition(coordinate);
 }
+
 
 // Attach to the search button
 document.getElementById('search-button').onclick = function () {
@@ -314,19 +384,6 @@ document.getElementById('search-button').onclick = function () {
         alert("Please enter a location to search.");
     }
 };
-
-// Center map on found location
-function displayLocation(location) {
-    var lonLat = [parseFloat(location.lon), parseFloat(location.lat)];
-    var coordinate = ol.proj.fromLonLat(lonLat);
-    mapView.animate({
-        center: coordinate,
-        duration: 1000,
-        zoom: 10
-    });
-    popup.setPosition(coordinate);
-    document.getElementById('popup-content').innerHTML = `<strong>Location Found</strong><br>${location.display_name}`;
-}
 
 // Find My Location Button functionality
 document.getElementById('find-my-location').onclick = function () {
@@ -343,10 +400,22 @@ document.getElementById('find-my-location').onclick = function () {
             });
 
             var content = `
-                <strong>Your Location</strong><br>
-                Latitude: ${latitude.toFixed(4)}<br>
-                Longitude: ${longitude.toFixed(4)}
-            `;
+            <div style="position: relative; text-align: left;">
+                <!-- Logo -->
+                <img id="popup-image" src="./image/jio.png" alt="Location Image" 
+                     style="width: 80px; height: 80px; border-radius: 50%; 
+                            position: absolute; top: -40px; left: 50%; transform: translateX(-50%); 
+                            border: 2px solid white; background: white; box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);">
+                
+                <!-- Popup Content -->
+                <div style="padding-top: 50px; text-align: left; font-family: Arial, sans-serif;">
+                    <strong>Your Location</strong><br>
+                    Latitude: ${latitude.toFixed(4)}<br>
+                    Longitude: ${longitude.toFixed(4)}
+                </div>
+            </div>
+        `;
+        
             document.getElementById('popup-content').innerHTML = content;
             popup.setPosition(coordinate);
         }, function (error) {
@@ -359,8 +428,197 @@ document.getElementById('find-my-location').onclick = function () {
 };
 
 // Logout button functionality
-document.getElementById('logout-button').addEventListener('click', () => {
-    // Example: Clear user session and redirect to login page
-    alert('You have been logged out!');
-    window.location.href = '/Users/NamanMalik/Downloads/Jio Project 3/public/Login & SignUp/jio_login.html'; // Replace with your login page URL
-});
+// Logout button functionality
+document.getElementById('logout-button').onclick = function () {
+    var content = `
+        <div style="position: relative; text-align: left; width: 300px; margin: auto; border: 1px solid #ccc; border-radius: 8px; background: #fff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); padding: 20px;">
+            <!-- Logo -->
+            <img id="popup-image" src="./image/jio.png" alt="Jio Logo" 
+                 style="width: 80px; height: 80px; border-radius: 50%; 
+                        display: block; margin: 0 auto; 
+                        border: 2px solid white; background: white; box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);">
+            
+            <!-- Popup Content -->
+            <div style="text-align: center; font-family: Arial, sans-serif; margin-top: 20px;">
+                <strong>Are you sure you want to logout?</strong><br><br>
+                <button id="confirm-logout" style="background: #f44336; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Logout</button>
+                <button id="cancel-logout" style="background: #4caf50; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-left: 10px;">Cancel</button>
+            </div>
+        </div>
+    `;
+
+    // Add the popup to the DOM
+    const popupContainer = document.createElement('div');
+    popupContainer.id = 'logout-popup';
+    popupContainer.style.position = 'fixed';
+    popupContainer.style.top = '0';
+    popupContainer.style.left = '0';
+    popupContainer.style.width = '100%';
+    popupContainer.style.height = '100%';
+    popupContainer.style.background = 'rgba(0, 0, 0, 0.5)';
+    popupContainer.style.display = 'flex';
+    popupContainer.style.alignItems = 'center';
+    popupContainer.style.justifyContent = 'center';
+    popupContainer.innerHTML = content;
+
+    document.body.appendChild(popupContainer);
+
+    // Add functionality to buttons
+    document.getElementById('confirm-logout').onclick = function () {
+        // Redirect to the login page
+        window.location.href = 'Login & SignUp/jio_login.html'; // Adjust the path if necessary
+    };
+
+    document.getElementById('cancel-logout').onclick = function () {
+        // Remove the popup from the DOM
+        document.body.removeChild(popupContainer);
+    };
+};
+
+// Show the zoom-to-coordinates popup when the button is clicked
+// document.getElementById('zoom-to-coordinates').onclick = function () {
+//     document.getElementById('coordinate-input').style.display = 'block';  // Show the input form
+// };
+
+// // Function to hide the input form when clicking "Deactivate" or any other button
+// document.getElementById('deactivate').onclick = function () {
+//     // Hide the input form when deactivating
+//     document.getElementById('coordinate-input').style.display = 'none';
+
+//     // You can also include other deactivate logic here if needed
+//     if (currentInteraction) {
+//         map.removeInteraction(currentInteraction);
+//         currentInteraction = null;
+//         measureType = null;
+//         document.getElementById('popup-content').innerHTML = "Functionality deactivated.";
+//     }
+
+//     enablePopup();  // Re-enable popup
+// };
+
+// // Function to handle finding the location from coordinates
+// document.getElementById('find-location').onclick = function () {
+//     var lat = parseFloat(document.getElementById('latitude').value);
+//     var lon = parseFloat(document.getElementById('longitude').value);
+    
+//     if (isNaN(lat) || isNaN(lon)) {
+//         alert("Please enter valid coordinates.");
+//         return;
+//     }
+
+//     // Zoom the map to the entered coordinates
+//     var coordinate = ol.proj.fromLonLat([lon, lat]);
+//     map.getView().setCenter(coordinate);
+//     map.getView().setZoom(12);  // Set a zoom level for better visibility
+
+//     // Optionally, display a message indicating the location was reached
+//     document.getElementById('popup-content').innerHTML = "Reached the location!";
+// };
+
+
+document.getElementById('scale-select').onclick = function () {
+    const scaleSelector = document.getElementById('scale-selector');
+    if (scaleSelector.style.display === 'block') {
+        scaleSelector.style.display = 'none';
+    } else {
+        scaleSelector.style.display = 'block';
+    }
+};
+
+// Handle scale change and apply zoom
+document.getElementById('scale-dropdown').onchange = function () {
+    const selectedScale = this.value;
+
+    if (selectedScale) {
+        // Logic to set zoom based on selected scale
+        const scaleToZoomMapping = {
+            36979000: 2,  // 1:36,979,000
+            18489000: 3,  // 1:18,489,000
+            9245000: 4,   // 1:9,245,000
+            4622000: 5,   // 1:4,622,000
+            2311000: 6,   // 1:2,311,000
+            1156000: 7,   // 1:1,156,000
+            578000: 8,    // 1:578,000
+            289000: 9,    // 1:289,000
+            144000: 10,   // 1:144,000
+            72000: 11,    // 1:72,000
+            36000: 12,    // 1:36,000
+            18000: 13,    // 1:18,000
+            9000: 14,     // 1:9,000
+            5000: 15,     // 1:5,000
+            2000: 16,     // 1:2,000
+            1000: 17      // 1:1,000
+        };
+
+        // Convert selected scale to number
+        const scale = parseInt(selectedScale, 10);
+        const zoom = scaleToZoomMapping[scale];
+
+        if (zoom !== undefined) {
+            map.getView().setZoom(zoom);
+        } else {
+            console.error('Scale not found in mapping:', scale);
+        }
+    }
+};
+
+document.getElementById('snapshot-button').onclick = function () {
+    // Add a flash effect
+    const flash = document.createElement('div');
+    flash.style.position = 'absolute';
+    flash.style.top = '0';
+    flash.style.left = '0';
+    flash.style.width = '100%';
+    flash.style.height = '100%';
+    flash.style.background = 'white';
+    flash.style.opacity = '0.8';
+    flash.style.zIndex = '9999'; // Ensure it overlays the map
+    flash.style.transition = 'opacity 0.5s ease-out';
+    document.body.appendChild(flash);
+
+    // Remove the flash after the effect
+    setTimeout(() => {
+        flash.style.opacity = '0'; // Fade out
+        setTimeout(() => {
+            document.body.removeChild(flash); // Remove element after fade
+        }, 500);
+    }, 200);
+
+    // Create a canvas to combine map layers
+    const mapCanvas = document.createElement('canvas');
+    const size = map.getSize(); // Get the map size
+    mapCanvas.width = size[0];
+    mapCanvas.height = size[1];
+
+    const context = mapCanvas.getContext('2d');
+    const mapViewport = map.getViewport();
+    const mapCanvasChildren = mapViewport.querySelectorAll('canvas');
+
+    // Check if there are canvases to draw
+    if (mapCanvasChildren.length === 0) {
+        console.error("No canvases found in the map viewport.");
+        alert("Snapshot cannot be created. Make sure map layers are loaded.");
+        return;
+    }
+
+    // Draw all canvas layers onto the snapshot canvas
+    mapCanvasChildren.forEach((canvas) => {
+        try {
+            if (canvas.width > 0 && canvas.height > 0) {
+                context.drawImage(canvas, 0, 0);
+            }
+        } catch (error) {
+            console.error("Error drawing canvas:", error);
+            alert("Unable to capture some layers due to cross-origin restrictions.");
+        }
+    });
+
+    // Generate image from the canvas
+    const imageData = mapCanvas.toDataURL('image/png');
+
+    // Trigger download
+    const downloadLink = document.createElement('a');
+    downloadLink.href = imageData;
+    downloadLink.download = 'map-snapshot.png';
+    downloadLink.click();
+};
