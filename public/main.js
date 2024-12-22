@@ -58,14 +58,37 @@ document.getElementById('satellite-view').addEventListener('click', function () 
 
 // Mouse Position control
 var mousePositionControl = new ol.control.MousePosition({
-    coordinateFormat: ol.coordinate.createStringXY(4),
+    coordinateFormat: ol.coordinate.createStringXY(4), // Display coordinates with 4 decimals
     projection: 'EPSG:4326',
     className: 'mouse-position',
     target: document.getElementById('mouse-position'),
-    undefinedHTML: '&nbsp;'
+    undefinedHTML: '&nbsp;' // Display empty space if no position
 });
 
+// Add the mouse position control to the map
 map.addControl(mousePositionControl);
+
+// Get the mouse position box element
+const mousePositionBox = document.getElementById("mouse-position");
+
+// Initially hide the mouse position box
+mousePositionBox.style.display = "none";
+
+// Event listener for mousemove on the map
+map.on("pointermove", function (event) {
+    // Show the mouse position box when the mouse moves inside the map
+    mousePositionBox.style.display = "block";
+});
+
+// Event listener for mouseout on the map (mouse leaves the map area)
+map.getViewport().addEventListener("mouseout", function () {
+    mousePositionBox.style.display = "none"; // Hide the box when mouse is outside the map
+});
+
+// Event listener for mouseenter on the map (mouse enters the map area)
+map.getViewport().addEventListener("mouseover", function () {
+    mousePositionBox.style.display = "block"; // Show the box when mouse is inside the map
+});
 
 // Scale Line control
 var scaleLineControl = new ol.control.ScaleLine();
@@ -428,7 +451,6 @@ document.getElementById('find-my-location').onclick = function () {
 };
 
 // Logout button functionality
-// Logout button functionality
 document.getElementById('logout-button').onclick = function () {
     var content = `
         <div style="position: relative; text-align: left; width: 300px; margin: auto; border: 1px solid #ccc; border-radius: 8px; background: #fff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); padding: 20px;">
@@ -476,44 +498,141 @@ document.getElementById('logout-button').onclick = function () {
 };
 
 // Show the zoom-to-coordinates popup when the button is clicked
-// document.getElementById('zoom-to-coordinates').onclick = function () {
-//     document.getElementById('coordinate-input').style.display = 'block';  // Show the input form
-// };
-
-// // Function to hide the input form when clicking "Deactivate" or any other button
-// document.getElementById('deactivate').onclick = function () {
-//     // Hide the input form when deactivating
-//     document.getElementById('coordinate-input').style.display = 'none';
-
-//     // You can also include other deactivate logic here if needed
-//     if (currentInteraction) {
-//         map.removeInteraction(currentInteraction);
-//         currentInteraction = null;
-//         measureType = null;
-//         document.getElementById('popup-content').innerHTML = "Functionality deactivated.";
-//     }
-
-//     enablePopup();  // Re-enable popup
-// };
-
-// // Function to handle finding the location from coordinates
-// document.getElementById('find-location').onclick = function () {
-//     var lat = parseFloat(document.getElementById('latitude').value);
-//     var lon = parseFloat(document.getElementById('longitude').value);
+// Ensure the input form is hidden initially when the page loads
+window.onload = function () {
+    // Hide the coordinate input form on page load
+    document.getElementById('coordinate-input').style.display = 'none';
     
-//     if (isNaN(lat) || isNaN(lon)) {
-//         alert("Please enter valid coordinates.");
-//         return;
-//     }
+    // Clear popup content (if necessary)
+    document.getElementById('popup-content').innerHTML = "";
 
-//     // Zoom the map to the entered coordinates
-//     var coordinate = ol.proj.fromLonLat([lon, lat]);
-//     map.getView().setCenter(coordinate);
-//     map.getView().setZoom(12);  // Set a zoom level for better visibility
+    // Set functionality state to inactive
+    isCoordinateInputActive = false;
+};
 
-//     // Optionally, display a message indicating the location was reached
-//     document.getElementById('popup-content').innerHTML = "Reached the location!";
-// };
+// When the "Zoom to Coordinates" button is clicked
+document.getElementById('zoom-to-coordinates').onclick = function () {
+    if (isCoordinateInputActive) {
+        // If functionality is active, hide the input form
+        document.getElementById('coordinate-input').style.display = 'none';
+        isCoordinateInputActive = false;
+    } else {
+        // If functionality is inactive, show the input form
+        document.getElementById('coordinate-input').style.display = 'block';
+        isCoordinateInputActive = true;
+    }
+};
+
+// Function to show the "Reached the location!" popup
+function showReachedLocationPopup() {
+    var content = `
+        <div style="position: relative; text-align: center; width: 300px; margin: auto; border: 1px solid #ccc; border-radius: 8px; background: #fff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); padding: 20px;">
+            <!-- Logo -->
+            <img id="popup-image" src="./image/jio.png" alt="Location Image" 
+                 style="width: 80px; height: 80px; border-radius: 50%; 
+                        display: block; margin: 0 auto; 
+                        border: 2px solid white; background: white; box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);">
+            
+            <!-- Popup Content -->
+            <div style="margin-top: 20px; font-family: Arial, sans-serif;">
+                <strong>Reached the location!</strong>
+            </div>
+        </div>
+    `;
+
+    // Add the popup to the DOM
+    const popupContainer = document.createElement('div');
+    popupContainer.id = 'reached-location-popup';
+    popupContainer.style.position = 'fixed';
+    popupContainer.style.top = '0';
+    popupContainer.style.left = '0';
+    popupContainer.style.width = '100%';
+    popupContainer.style.height = '100%';
+    popupContainer.style.background = 'rgba(0, 0, 0, 0.5)';
+    popupContainer.style.display = 'flex';
+    popupContainer.style.alignItems = 'center';
+    popupContainer.style.justifyContent = 'center';
+    popupContainer.innerHTML = content;
+
+    document.body.appendChild(popupContainer);
+
+    setTimeout(() => {
+        document.body.removeChild(popupContainer);
+
+        // Show the latitude and longitude input form again
+        document.getElementById('coordinate-input').style.display = 'block';
+        isCoordinateInputActive = true;
+    }, 2000);
+}
+
+// When the "Find Location" button is clicked
+document.getElementById('find-location').onclick = function () {
+    var lat = parseFloat(document.getElementById('latitude').value);
+    var lon = parseFloat(document.getElementById('longitude').value);
+
+    if (isNaN(lat) || isNaN(lon)) {
+        alert("Please enter valid coordinates.");
+        return;
+    }
+
+    // Zoom the map to the entered coordinates
+    var coordinate = ol.proj.fromLonLat([lon, lat]);
+    map.getView().setCenter(coordinate);
+    map.getView().setZoom(12);  // Set a zoom level for better visibility
+
+    // Close the input form after finding the location
+    document.getElementById('coordinate-input').style.display = 'none';
+    isCoordinateInputActive = false;
+
+    // Show the "Reached the location!" popup
+    showReachedLocationPopup(lat, lon);
+
+    // Optionally, trigger the popup if needed (this depends on how your popup is implemented)
+    if (popupOverlay) {
+        popupOverlay.setPosition(coordinate);  // Assuming you have a popup overlay
+    }
+
+    // Deactivate functionality after zooming
+    if (currentInteraction) {
+        map.removeInteraction(currentInteraction);
+        currentInteraction = null;
+        measureType = null;
+    }
+
+    enablePopup();  // Re-enable popup
+};
+
+// Optional: Deactivate functionality when clicking "Deactivate" button
+document.getElementById('deactivate').onclick = function () {
+    document.getElementById('coordinate-input').style.display = 'none';  // Hide the input form
+    isCoordinateInputActive = false;
+
+    // Deactivate measure or other logic here
+    if (currentInteraction) {
+        map.removeInteraction(currentInteraction);
+        currentInteraction = null;
+        measureType = null;
+        document.getElementById('popup-content').innerHTML = "Functionality deactivated.";  // Optional: message in popup
+    }
+
+    enablePopup();  // Re-enable popup
+};
+
+// Optional: Deactivate functionality when clicking "Deactivate" button
+document.getElementById('deactivate').onclick = function () {
+    document.getElementById('coordinate-input').style.display = 'none';  // Hide the input form
+    isCoordinateInputActive = false;
+
+    // Deactivate measure or other logic here
+    if (currentInteraction) {
+        map.removeInteraction(currentInteraction);
+        currentInteraction = null;
+        measureType = null;
+        document.getElementById('popup-content').innerHTML = "Functionality deactivated.";  // Optional: message in popup
+    }
+
+    enablePopup();  // Re-enable popup
+};
 
 
 document.getElementById('scale-select').onclick = function () {
@@ -622,3 +741,183 @@ document.getElementById('snapshot-button').onclick = function () {
     downloadLink.download = 'map-snapshot.png';
     downloadLink.click();
 };
+
+// Get references to the sidebar and buttons
+const slidebar = document.getElementById('slidebar');
+const layersButton = document.getElementById('layers-button');
+
+// Function to toggle the slide bar
+function toggleSlidebar() {
+    const isOpen = slidebar.style.left === '4rem'; // Check if it's already open
+    if (isOpen) {
+        slidebar.style.left = '-100%'; // Hide the slidebar
+    } else {
+        slidebar.style.left = '4rem'; // Show the slidebar next to the button
+    }
+}
+
+// Add click event listener to the layers button
+layersButton.addEventListener('click', toggleSlidebar);
+
+// Import necessary libraries
+// Get references to DOM elements
+const fileInput = document.getElementById("shp-file-upload");
+const fileContainer = document.getElementById("file-container");
+let shapefileLayers = {}; // To store layers by file name
+
+// Add event listener for shapefile upload
+fileInput.addEventListener("change", function () {
+    const file = fileInput.files[0]; // Get the uploaded file
+    if (file) {
+        const fileName = file.name;
+        const fileExtension = fileName.split('.').pop().toLowerCase();
+
+        if (fileExtension === "zip") {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const arrayBuffer = event.target.result;
+
+                // Parse the shapefile using shp.js
+                shp(arrayBuffer).then(function (geojson) {
+                    addShapefileToMap(fileName, geojson); // Add shapefile to map
+                }).catch(function (error) {
+                    console.error("Error parsing shapefile: ", error);
+                });
+            };
+            reader.readAsArrayBuffer(file);
+
+            // Display file in sidebar with checkbox
+            displayFileWithCheckbox(fileName);
+        } else {
+            alert("Please upload a .zip file containing the shapefile.");
+        }
+    }
+});
+
+// Display uploaded file with checkbox in the sidebar
+function displayFileWithCheckbox(fileName) {
+    const fileBox = document.createElement("div");
+    fileBox.classList.add("flex", "items-center", "p-2", "mt-3");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.classList.add("mr-4", "h-4", "w-4");
+    checkbox.checked = true; // Default to checked
+
+    const fileLabel = document.createElement("span", "text-xl", "text-black");
+    fileLabel.textContent = fileName;
+
+    // Toggle shapefile layer visibility
+    checkbox.addEventListener("change", function () {
+        if (checkbox.checked) {
+            shapefileLayers[fileName].setVisible(true);
+        } else {
+            shapefileLayers[fileName].setVisible(false);
+        }
+    });
+
+    fileBox.appendChild(checkbox);
+    fileBox.appendChild(fileLabel);
+    fileContainer.appendChild(fileBox);
+}
+
+// Add parsed shapefile to the map
+function addShapefileToMap(fileName, geojson) {
+    const vectorSource = new ol.source.Vector({
+        features: new ol.format.GeoJSON().readFeatures(geojson, {
+            dataProjection: 'EPSG:4326', // GeoJSON standard projection
+            featureProjection: 'EPSG:3857', // Map projection
+        }),
+    });
+
+    const vectorLayer = new ol.layer.Vector({
+        source: vectorSource,
+        style: new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: 'blue', // Border color
+                width: 2,
+            }),
+            fill: new ol.style.Fill({
+                color: 'rgba(0, 0, 255, 0.1)', // Fill color with transparency
+            }),
+        }),
+    });
+
+    // Store the layer by file name
+    shapefileLayers[fileName] = vectorLayer;
+
+    // Add the layer to the existing map
+    map.addLayer(vectorLayer);
+
+    // Zoom to the extent of the uploaded shapefile
+    map.getView().fit(vectorSource.getExtent(), {
+        padding: [50, 50, 50, 50],
+    });
+}
+
+
+// Get UI Elements
+// const shareButton = document.getElementById("share-button");
+// const shareModal = document.getElementById("share-modal");
+// const shareLinkInput = document.getElementById("share-link");
+// const copyButton = document.getElementById("copy-button");
+// const closeModal = document.getElementById("close-modal");
+
+// // Debugging: Ensure elements are properly selected
+// console.log({ shareButton, shareModal, shareLinkInput, copyButton, closeModal });
+
+// // Function to generate shareable link
+// function generateShareableLink() {
+//     const view = map.getView(); // Get map view
+//     const center = view.getCenter(); // Get map center [x, y]
+//     const zoom = view.getZoom(); // Get zoom level
+
+//     // Convert center to lat/lon if necessary (assuming EPSG:3857)
+//     const lonLat = ol.proj.toLonLat(center);
+
+//     // Generate link with center coordinates and zoom level
+//     const baseUrl = window.location.origin + window.location.pathname;
+//     const shareLink = `${baseUrl}?lat=${lonLat[1]}&lon=${lonLat[0]}&zoom=${zoom}`;
+
+//     return shareLink;
+// }
+
+// // Show modal with shareable link
+// shareButton.addEventListener("click", () => {
+//     console.log("Share button clicked"); // Debug
+//     const link = generateShareableLink();
+//     shareLinkInput.value = link;
+//     shareModal.classList.remove("hidden"); // Show modal
+//     console.log("Modal displayed with link:", link); // Debug
+// });
+
+// // Copy link to clipboard
+// copyButton.addEventListener("click", () => {
+//     shareLinkInput.select();
+//     document.execCommand("copy");
+//     alert("Link copied to clipboard!");
+// });
+
+// // Close modal
+// closeModal.addEventListener("click", () => {
+//     shareModal.classList.add("hidden"); // Hide modal
+//     console.log("Modal closed"); // Debug
+// });
+
+// // Parse URL parameters to restore map view
+// function setMapViewFromUrl() {
+//     const urlParams = new URLSearchParams(window.location.search);
+//     const lat = parseFloat(urlParams.get("lat"));
+//     const lon = parseFloat(urlParams.get("lon"));
+//     const zoom = parseInt(urlParams.get("zoom"));
+
+//     if (lat && lon && zoom) {
+//         const center = ol.proj.fromLonLat([lon, lat]); // Convert lat/lon to map projection
+//         map.getView().setCenter(center);
+//         map.getView().setZoom(zoom);
+//         console.log("Map view restored from URL:", { lat, lon, zoom }); // Debug
+//     }
+// }
+
+// // Call the function on page load
+// setMapViewFromUrl();
