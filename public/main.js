@@ -1,14 +1,74 @@
 // Map view setup
 var mapView = new ol.View({
-    center: ol.proj.fromLonLat([72.585717, 23.021245]),
+    center: ol.proj.fromLonLat([72.585717, 23.021245]), // Center the map
     zoom: 8
-    
 });
 
+// Add OpenStreetMap tile layer
+var tileLayer = new ol.layer.Tile({
+    source: new ol.source.OSM(),
+});
+
+// Tile grid overlay (blue boxes with white internal lines)
+var tileGridOverlay = new ol.layer.Vector({
+    source: new ol.source.Vector(),
+    style: new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: 'blue', // Blue border for tiles
+            width: 2
+        }),
+        fill: new ol.style.Fill({
+            color: 'rgba(255, 255, 255, 0)', // Transparent fill
+        }),
+    }),
+});
+
+// Function to create grid lines
+function updateTileGridOverlay() {
+    var source = tileGridOverlay.getSource();
+    source.clear();
+
+    var extent = map.getView().calculateExtent(map.getSize());
+    var zoom = map.getView().getZoom();
+    var tileGrid = ol.tilegrid.createXYZ({ tileSize: 256 });
+
+    var tiles = tileGrid.getTileRangeForExtentAndZ(extent, Math.round(zoom));
+    for (var x = tiles.minX; x <= tiles.maxX; x++) {
+        for (var y = tiles.minY; y <= tiles.maxY; y++) {
+            var tileExtent = tileGrid.getTileCoordExtent([Math.round(zoom), x, y]);
+
+            // Add tile boundaries (mimicking internal lines)
+            var feature = new ol.Feature({
+                geometry: new ol.geom.Polygon.fromExtent(tileExtent),
+            });
+
+            feature.setStyle(
+                new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: 'white', // Internal white lines
+                        width: 1, // Thin white line
+                    }),
+                })
+            );
+
+            source.addFeature(feature);
+        }
+    }
+}
+
+// Initialize the map
 var map = new ol.Map({
     target: 'map',
+    layers: [tileLayer, tileGridOverlay],
     view: mapView
 });
+
+// Update the tile grid overlay when the view changes
+map.getView().on('change:center', updateTileGridOverlay);
+map.getView().on('change:resolution', updateTileGridOverlay);
+
+// Initial draw
+updateTileGridOverlay();
 
 var osmTile = new ol.layer.Tile({
     title: 'Open Street Map',
@@ -329,6 +389,66 @@ map.on('singleclick', function (event) {
         });
 });
 
+// Function to fetch location suggestions from OpenStreetMap API
+function fetchSuggestions() {
+    const query = document.getElementById('search-input').value;
+
+    // Show suggestions only if the query length is greater than 2 characters
+    if (query.length > 0) {
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    displaySuggestions(data);  // Display suggestions if available
+                } else {
+                    clearSuggestions();  // Clear suggestions if no results found
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching suggestions:', error);
+                clearSuggestions();
+            });
+    } else {
+        clearSuggestions();  // Clear suggestions if input is too short
+    }
+}
+
+// Function to display location suggestions directly under the input field
+function displaySuggestions(suggestions) {
+    const suggestionsContainer = document.getElementById('suggestions-container');
+    suggestionsContainer.innerHTML = '';  // Clear previous suggestions
+
+    suggestions.forEach(suggestion => {
+        const suggestionItem = document.createElement('div');
+        suggestionItem.classList.add('px-4', 'py-2', 'cursor-pointer', 'hover:bg-blue-100', 'text-black');
+        suggestionItem.textContent = suggestion.display_name;
+
+        // When a suggestion is clicked, update the input and center the map
+        suggestionItem.onclick = function () {
+            document.getElementById('search-input').value = suggestion.display_name;  // Set input to selected suggestion
+            clearSuggestions();  // Clear suggestions after selection
+            searchLocation(suggestion.display_name);  // Perform search with the selected location
+        };
+
+        suggestionsContainer.appendChild(suggestionItem);
+    });
+
+    const inputElement = document.getElementById('search-input');
+    suggestionsContainer.style.width = `${inputElement.offsetWidth * 1}px`;  // Set width of suggestions container to 80% of input width
+
+
+    // Make the suggestions container visible
+    suggestionsContainer.classList.remove('hidden');
+}
+
+// Function to clear the suggestions
+function clearSuggestions() {
+    const suggestionsContainer = document.getElementById('suggestions-container');
+    suggestionsContainer.innerHTML = '';  // Clear suggestions
+    suggestionsContainer.classList.add('hidden');  // Hide the suggestions container
+}
 // Search Location
 function searchLocation(query) {
     var urlIndia = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&countrycodes=IN&limit=1`;
@@ -786,26 +906,35 @@ fileInput.addEventListener("change", function () {
             };
             reader.readAsArrayBuffer(file);
 
-            // Display file in sidebar with checkbox
-            displayFileWithCheckbox(fileName);
+            // Display file in sidebar with drag-and-drop functionality
+            displayFileWithDrag(fileName);
         } else {
             alert("Please upload a .zip file containing the shapefile.");
         }
     }
 });
 
-// Display uploaded file with checkbox in the sidebar
-function displayFileWithCheckbox(fileName) {
+// Display uploaded file with drag-and-drop functionality
+function displayFileWithDrag(fileName) {
     const fileBox = document.createElement("div");
-    fileBox.classList.add("flex", "items-center", "p-2", "mt-3");
+    fileBox.classList.add("flex", "items-center", "p-2", "mt-3", "draggable-item");
+    fileBox.setAttribute("draggable", "true"); // Enable drag-and-drop functionality
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
-    checkbox.classList.add("mr-4", "h-4", "w-4");
+    checkbox.classList.add("mr-4");
     checkbox.checked = true; // Default to checked
+    checkbox.style.width = "23px";
+    checkbox.style.height = "23px";
 
-    const fileLabel = document.createElement("span", "text-xl", "text-black");
+    const fileLabel = document.createElement("span");
     fileLabel.textContent = fileName;
+    fileLabel.style.fontSize = "20px"; // Slightly larger font
+    fileLabel.style.color = "#000000"; // Black color
+
+    fileBox.appendChild(checkbox);
+    fileBox.appendChild(fileLabel);
+    fileContainer.appendChild(fileBox);
 
     // Toggle shapefile layer visibility
     checkbox.addEventListener("change", function () {
@@ -816,9 +945,8 @@ function displayFileWithCheckbox(fileName) {
         }
     });
 
-    fileBox.appendChild(checkbox);
-    fileBox.appendChild(fileLabel);
-    fileContainer.appendChild(fileBox);
+    // Add drag-and-drop functionality
+    addDragAndDropEvents(fileBox);
 }
 
 // Add parsed shapefile to the map
@@ -855,69 +983,197 @@ function addShapefileToMap(fileName, geojson) {
     });
 }
 
+// Drag-and-Drop Functionality
+function addDragAndDropEvents(item) {
+    item.addEventListener("dragstart", function (e) {
+        e.dataTransfer.setData("text/plain", "");
+        item.classList.add("dragging");
+    });
 
-// Get UI Elements
-// const shareButton = document.getElementById("share-button");
-// const shareModal = document.getElementById("share-modal");
-// const shareLinkInput = document.getElementById("share-link");
-// const copyButton = document.getElementById("copy-button");
-// const closeModal = document.getElementById("close-modal");
+    item.addEventListener("dragover", function (e) {
+        e.preventDefault(); // Allow dropping
+        const draggingItem = document.querySelector(".dragging");
+        const siblings = [...fileContainer.children].filter((child) => child !== draggingItem);
+        const nextSibling = siblings.find((sibling) => {
+            const box = sibling.getBoundingClientRect();
+            return e.clientY < box.top + box.height / 2;
+        });
 
-// // Debugging: Ensure elements are properly selected
-// console.log({ shareButton, shareModal, shareLinkInput, copyButton, closeModal });
+        if (nextSibling) {
+            fileContainer.insertBefore(draggingItem, nextSibling);
+        } else {
+            fileContainer.appendChild(draggingItem);
+        }
+    });
 
-// // Function to generate shareable link
-// function generateShareableLink() {
-//     const view = map.getView(); // Get map view
-//     const center = view.getCenter(); // Get map center [x, y]
-//     const zoom = view.getZoom(); // Get zoom level
+    item.addEventListener("dragend", function () {
+        item.classList.remove("dragging");
+    });
+}
 
-//     // Convert center to lat/lon if necessary (assuming EPSG:3857)
-//     const lonLat = ol.proj.toLonLat(center);
+//Share link
+// Function to get the current map link
+function getMapLink() {
+    const center = ol.proj.toLonLat(map.getView().getCenter()); // Get map center in lon/lat
+    const zoom = map.getView().getZoom(); // Get current zoom level
 
-//     // Generate link with center coordinates and zoom level
-//     const baseUrl = window.location.origin + window.location.pathname;
-//     const shareLink = `${baseUrl}?lat=${lonLat[1]}&lon=${lonLat[0]}&zoom=${zoom}`;
+    // Construct the URL with center and zoom as query parameters
+    const url = new URL(window.location.href); 
+    url.searchParams.set('center', JSON.stringify(center)); // Add center to the URL
+    url.searchParams.set('zoom', zoom); // Add zoom to the URL
 
-//     return shareLink;
-// }
+    return url.toString(); // Return the full URL with parameters
+}
 
-// // Show modal with shareable link
-// shareButton.addEventListener("click", () => {
-//     console.log("Share button clicked"); // Debug
-//     const link = generateShareableLink();
-//     shareLinkInput.value = link;
-//     shareModal.classList.remove("hidden"); // Show modal
-//     console.log("Modal displayed with link:", link); // Debug
-// });
+// Event listener for the "Share" button
+const shareButton = document.getElementById('share-button');
+shareButton.addEventListener('click', () => {
+    const mapLink = getMapLink(); // Generate the link based on current map state
 
-// // Copy link to clipboard
-// copyButton.addEventListener("click", () => {
-//     shareLinkInput.select();
-//     document.execCommand("copy");
-//     alert("Link copied to clipboard!");
-// });
+    // Copy the generated link to clipboard
+    navigator.clipboard.writeText(mapLink)
+        .then(() => {
+            showPopup(mapLink); // Show custom popup with map link after copying
+        })
+        .catch((err) => {
+            console.error('Failed to copy map link: ', err); // Error handling
+        });
+});
 
-// // Close modal
-// closeModal.addEventListener("click", () => {
-//     shareModal.classList.add("hidden"); // Hide modal
-//     console.log("Modal closed"); // Debug
-// });
+// Function to show the custom popup with the link and a copy button
+function showPopup(mapLink) {
+    const content = `
+        <div style="position: relative; text-align: center; width: 260px; margin: auto; border: 1px solid #ccc; border-radius: 8px; background: #fff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); padding: 10px; display: flex; flex-direction: column; align-items: center;">
+            <!-- Logo -->
+            <img id="popup-image" src="./image/jio.png" alt="Location Image" 
+                 style="width: 60px; height: 60px; border-radius: 50%; 
+                        display: block; margin: 0 auto; 
+                        border: 2px solid white; background: white; box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);">
 
-// // Parse URL parameters to restore map view
-// function setMapViewFromUrl() {
-//     const urlParams = new URLSearchParams(window.location.search);
-//     const lat = parseFloat(urlParams.get("lat"));
-//     const lon = parseFloat(urlParams.get("lon"));
-//     const zoom = parseInt(urlParams.get("zoom"));
+            <!-- Popup Content -->
+            <div style="margin-top: 10px; font-family: Arial, sans-serif; text-align: center;">
+                <strong>Map link generated!</strong>
+                
+                <!-- Flex container for the link and button -->
+                <div style="display: flex; align-items: center; margin-top: 10px;">
+                    <!-- Map link -->
+                    <div style="background: #f0f0f0; padding: 6px 8px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; max-width: 200px; text-align: left;">
+                        ${mapLink} <!-- Display the map link (truncated if too long) -->
+                    </div>
 
-//     if (lat && lon && zoom) {
-//         const center = ol.proj.fromLonLat([lon, lat]); // Convert lat/lon to map projection
-//         map.getView().setCenter(center);
-//         map.getView().setZoom(zoom);
-//         console.log("Map view restored from URL:", { lat, lon, zoom }); // Debug
-//     }
-// }
+                    <!-- Copy button -->
+                    <button id="copy-link" style="padding: 0; background-color: transparent; border: none; cursor: pointer; margin-left: 10px;">
+                        <img src="./image/copy.png" alt="Copy" style="width: 20px; height: 20px; vertical-align: middle;">
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
 
-// // Call the function on page load
-// setMapViewFromUrl();
+    // Create the popup container and append to the body
+    const popup = document.createElement('div');
+    popup.id = 'custom-popup';
+    popup.innerHTML = content;
+    popup.style.position = 'fixed';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.zIndex = '9999';
+    popup.style.background = 'rgba(0, 0, 0, 0.5)';
+    popup.style.width = '100%';
+    popup.style.height = '100%';
+    popup.style.display = 'flex';
+    popup.style.alignItems = 'center';
+    popup.style.justifyContent = 'center';
+
+    // Append popup to the document
+    document.body.appendChild(popup);
+
+    // Add event listener to the "Copy Link" button
+    const copyButton = document.getElementById('copy-link');
+    copyButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(mapLink)
+            .then(() => {
+                alert('Map link copied to clipboard!'); // Show confirmation alert
+                popup.remove(); // Remove the popup once link is copied
+            })
+            .catch((err) => {
+                console.error('Failed to copy map link: ', err);
+            });
+    });
+}
+
+// Update URL parameters if the map's center or zoom changes
+map.getView().on('change:center', () => {
+    const mapLink = getMapLink(); // Generate the updated link with new map center
+    window.history.replaceState({}, '', mapLink); // Update the browser URL without reloading
+});
+
+map.getView().on('change:resolution', () => {
+    const mapLink = getMapLink(); // Generate the updated link with new zoom level
+    window.history.replaceState({}, '', mapLink); // Update the browser URL without reloading
+});
+
+// Function to add WMS layer
+function addWMSLayer(wmsUrl) {
+    // Fetch the WMS Capabilities
+    fetch(`${wmsUrl}?service=WMS&version=1.3.0&request=GetCapabilities`)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch WMS Capabilities. Server responded with an error.');
+            }
+            return response.text();
+        })
+        .then((capabilities) => {
+            const parser = new ol.format.WMSCapabilities();
+            let result;
+
+            try {
+                result = parser.read(capabilities);
+            } catch (error) {
+                throw new Error('Error parsing WMS Capabilities.');
+            }
+
+            const firstLayer = result?.Capability?.Layer?.Layer?.[0];
+            if (!firstLayer) {
+                throw new Error('No layers available in the provided WMS service.');
+            }
+
+            const layerName = firstLayer.Name;
+
+            // Add the WMS layer to the map
+            const wmsLayer = new ol.layer.Tile({
+                source: new ol.source.TileWMS({
+                    url: wmsUrl,
+                    params: { 'LAYERS': layerName, 'TILED': true },
+                }),
+            });
+
+            map.addLayer(wmsLayer);
+
+            // Fit the map to the layer extent if available
+            if (firstLayer.BoundingBox) {
+                const bbox = firstLayer.BoundingBox[0].extent;
+                const projection = firstLayer.BoundingBox[0].crs || 'EPSG:4326';
+                const transformedBbox = ol.proj.transformExtent(bbox, projection, 'EPSG:3857');
+                map.getView().fit(transformedBbox, { duration: 1000 });
+            } else {
+                alert('Bounding box not found for the layer. The map view will not adjust.');
+            }
+
+            alert(`WMS Layer '${layerName}' added successfully!`);
+        })
+        .catch((error) => {
+            console.error('Error adding WMS layer:', error);
+            alert(error.message || 'An unexpected error occurred.');
+        });
+}
+
+document.getElementById('wms-button').addEventListener('click', () => {
+    const wmsUrl = prompt('Enter the WMS URL:');
+    if (!wmsUrl) {
+        alert('WMS URL cannot be empty.');
+        return;
+    }
+    addWMSLayer(wmsUrl);
+});
